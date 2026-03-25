@@ -2,10 +2,7 @@
 
 ---
 
-## 🇬🇧 English version
-
-**Timeline:** Q2 2025  
-**Role:** Data Analyst / ML Engineer  
+## 🇬🇧 English version 
 **Tech stack:** Python • pandas • numpy • scikit-learn • SQL • Airflow • Power BI • Jupyter Notebook  
 
 ### Context
@@ -24,7 +21,7 @@ Develop a universal **Badness Score** metric to:
 ### Approach
 
 **Data Pipeline**  
-- Gather metrics for all intents: accuracy, automation rate, KSAT, drop-offs, operator handling time.  
+- Gather metrics for all intents: accuracy, automation rate, CSAT, drop-offs, operator handling time.  
 - ETL pipeline using Airflow for automated collection and preprocessing.  
 
 **Metric Design**  
@@ -72,10 +69,7 @@ Develop a universal **Badness Score** metric to:
 
 ---
 
-## 🇷🇺 Русский вариант
-
-**Сроки:** II квартал 2025  
-**Роль:** Data Analyst / ML Engineer  
+## 🇷🇺 Русский вариант 
 **Технологии:** Python • pandas • numpy • scikit-learn • SQL • Airflow • Power BI • Jupyter Notebook  
 
 ### Контекст
@@ -94,16 +88,16 @@ Develop a universal **Badness Score** metric to:
 ### Подход
 
 **Data Pipeline**  
-- Сбор метрик для всех интентов: точность, автоматизация, KSAT, отказы, время на операторе.  
+- Сбор метрик для всех интентов: точность, автоматизация, CSAT, отказы, время на операторе, проблемы, усилия и т.д.  
 - Автоматизированный ETL-процесс через Airflow.  
 
 **Метрика**  
-- Авторская формула с весами:  
+- Формула для оценки важности признаков посредством весов:  
   `Badness_Score = w1*(1-accuracy) + w2*(1-operator_time) + ...`  
-- Гибкое управление весами: разные роли могут приоритизировать показатели без ручного пересчета.
+- Гибкое управление весами: разные роли могут приоритизировать показатели без ручного пересчета. 
 
 **Аналитика и визуализация**  
-- ML-предобработка: выявление выбросов по процентилям, работа с пропусками, нормализация (Z-score, MinMax).  
+- Предобработка: выявление выбросов по перцентилям, работа с пропусками, нормализация (Z-score, MinMax).  
 - Функции для расчета с возможностью исключения метрик или задания кастомных порогов.  
 - Дашборды в Power BI с топ-10 "плохих" интентов и динамикой изменений.  
 
@@ -121,8 +115,8 @@ Develop a universal **Badness Score** metric to:
 
 ### Результаты
 - Сокращение времени на поиск проблемных интентов на 80%+.  
-- Менеджеры видят топ-10 худших интентов сразу.  
-- Выявлены высокообъемные интенты, ранее не считавшиеся проблемными.  
+- Разные роли видят топ-10 худших интентов сразу (в зависимости от выбранного приоритета по метрикам).  
+- Выявлены объемные "плохие" интенты, ранее не считавшиеся проблемными.  
 
 ### Бизнес-эффект
 - Снижение SLA.  
@@ -131,7 +125,7 @@ Develop a universal **Badness Score** metric to:
 - Рост точности системы.
 
 ### Ключевые навыки
-- Разработка метрик качества для ML-систем.  
+- Разработка метрик качества.  
 - Автоматизированные аналитические пайплайны.  
 - Валидация метрик на исторических данных и экспертах.  
 - Гибкая настройка весов для разных ролей команды.
