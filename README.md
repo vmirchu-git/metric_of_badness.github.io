@@ -1,135 +1,72 @@
-# Badness Score Metric for Intent Quality Monitoring
+<p align="center">
+  <img src="assets/badness_score_diagram.svg" alt="Badness Score pipeline diagram" width="100%">
+</p>
+
+<p align="right"><a href="README.ru.md">Русская версия →</a></p>
+
+# Badness Score: a Universal Metric for Intent Quality Monitoring
+
+![Python](https://img.shields.io/badge/Python-pandas-14131a?style=flat-square&labelColor=14131a&color=7a1f2b)
+![Airflow](https://img.shields.io/badge/Airflow-ETL-14131a?style=flat-square&labelColor=14131a&color=7a1f2b)
+![Power BI](https://img.shields.io/badge/Power%20BI-dashboards-14131a?style=flat-square&labelColor=14131a&color=7a1f2b)
+![status](https://img.shields.io/badge/status-adopted-14131a?style=flat-square&labelColor=14131a&color=c9a227)
+
+> **Note on source code.** This repository documents methodology, design decisions, and results only. The implementation is proprietary to the employer where this project was built and is not published here.
+
+A single composite metric that turns a scattered, fragmented view of intent quality into one ranked, role-adjustable priority list — so any team could immediately see which intents needed attention most, without running a separate analysis every time.
+
+## At a glance
+
+| | |
+|---|---|
+| **Problem-intent detection time** | reduced by 80%+ |
+| **Detection accuracy** | 90% of problem intents caught on the first pass, confirmed in practice |
+| **Analyst time saved** | up to 20 hours per month |
+| **Scale** | applied across all chatbot channels and intents; used by every relevant role, not a single team |
+| **Status** | adopted by the team currently building chatbot automation services |
+
+## Problem
+
+The team managed a large pool of chatbot intents with no unified way to spot which ones were degrading. Evaluation was fragmented across separate, disconnected metrics, which made prioritization across teams genuinely hard — a low-performing intent could go unnoticed simply because no single metric was bad enough on its own to trigger attention, while the combination of several mediocre metrics was quietly causing real damage: more automation errors, higher operator workload, and SLA delays.
+
+## Approach
+
+**The core idea.** Badness Score isn't tied to a fixed set of metrics — it's a weighted combination where any metric can be added:
+
+```
+Badness_Score = w1·(1 − accuracy) + w2·(1 − operator_time) + ...
+```
+
+Each stakeholder can adjust the weights to match what they actually care about — an operations lead might weight operator handling time heavily, while a product manager might prioritize CSAT — without anyone needing to rebuild the underlying pipeline or recompute anything by hand.
+
+**Data pipeline.** An Airflow-orchestrated ETL job collects the full set of input metrics (accuracy, automation rate, CSAT, drop-off rate, operator handling time, and others) for every intent, on a recurring schedule.
+
+**Preprocessing.** Outliers are flagged via percentile thresholds, missing values are handled explicitly rather than silently dropped, and metrics are normalized (Z-score and MinMax were both tested) so that combining metrics on very different scales doesn't quietly bias the result toward whichever one happens to have the largest raw numbers.
+
+**Visualization.** Power BI dashboards surface the top-10 worst-performing intents, with the ranking updating automatically as the underlying weights change per viewer role.
+
+**Validation.** The metric's ability to flag genuinely problematic intents was checked against manual expert assessments, using recall for problem-intent identification (target threshold above 0.8) as the validation criterion.
+
+**LLM assistance.** An LLM was used to speed up classification of newly created intents and to generate test examples during development.
+
+## Results
+
+- Reduced the time to detect problem intents by more than 80%.
+- Caught 90% of genuinely problem intents on the first pass — confirmed against expert review, not just a design target.
+- Different roles could see their own top-10 priority list instantly, based on the metrics that mattered most to them, instead of waiting on a custom analysis.
+- Surfaced high-volume intents that hadn't previously been flagged as problematic under the old, fragmented evaluation approach.
+
+## Business impact
+
+- Reduced SLA violations by catching quality degradation earlier.
+- Lowered operator workload by addressing root causes sooner.
+- Saved up to 20 hours of analyst work per month that had previously gone into fragmented, manual evaluation.
+- Contributed to a measurable increase in overall chatbot accuracy.
+
+## Tech stack
+
+Python · pandas · NumPy · scikit-learn · SQL · Airflow · Power BI · Jupyter Notebook
 
 ---
 
-## 🇬🇧 English version 
-**Tech stack:** Python • pandas • numpy • scikit-learn • SQL • Airflow • Power BI • Jupyter Notebook  
-
-### Context
-The product team was handling a large pool of chatbot intents, but there was no unified metric to quickly identify intents with degrading quality. Evaluations were fragmented, time-consuming, and it was hard to prioritize improvements across different teams. Low-performing intents led to more errors in automation, higher operator workload, and SLA delays.
-
-### Goal
-Develop a universal **Badness Score** metric to:  
-- Quickly identify intents that need optimization.  
-- Automate calculation and monitoring.  
-- Visualize trends across intents and over time.  
-
-**Success Criteria:**  
-- Detect 90% of problem intents immediately.  
-- Ensure correlation with manual expert assessments.
-
-### Approach
-
-**Data Pipeline**  
-- Gather metrics for all intents: accuracy, automation rate, CSAT, drop-offs, operator handling time.  
-- ETL pipeline using Airflow for automated collection and preprocessing.  
-
-**Metric Design**  
-- Custom formula combining weighted metrics:  
-  `Badness_Score = w1*(1-accuracy) + w2*(1-operator_time) + ...`  
-- Flexible weighting: different stakeholders can prioritize metrics according to role without manual recalculation.  
-
-**Analytics & Visualization**  
-- ML-based preprocessing: outlier detection via percentiles, handling missing values, normalization (Z-score, MinMax).  
-- Functions to compute scores with optional metric exclusion or custom thresholds.  
-- Power BI dashboards showing top “bad” intents and temporal dynamics.  
-
-**Experiments**  
-- Tested normalization approaches for stability.  
-- A/B-tested visualizations (tables vs charts).  
-- Compared single-metric ranking vs composite Badness Score.  
-
-**AI Support**  
-- LLMs used for quick classification of new intents and generation of test examples.
-
-**Evaluation Metrics**  
-- Correlation with expert scores.  
-- Recall for identifying problem intents (threshold > 0.8).
-
-### Results
-- Reduced problem-intent detection time by 80%+.  
-- Managers can immediately see the top-10 worst-performing intents.  
-- Revealed high-volume intents previously not flagged as problematic.  
-
-### Business Impact
-- Reduced SLA violations.  
-- Lower operator workload.  
-- Saved up to 20 hours of analyst work per month.  
-- Increased overall chatbot accuracy.
-
-### Key Skills Highlighted for ML/Analytics Engineer
-- Developing quality metrics for ML systems.  
-- Automated analytical pipelines for intent monitoring.  
-- Metric validation using historical data and expert evaluation.  
-- Customizable metric weighting for multi-stakeholder priorities.
-
-### Data Pipeline
-
-![Pipeline diagram](assets/pipeline_gb_version.png)
-
----
-
-## 🇷🇺 Русский вариант 
-**Технологии:** Python • pandas • numpy • scikit-learn • SQL • Airflow • Power BI • Jupyter Notebook  
-
-### Контекст
-Команда работала с большим пулом интентов чатбота, но не существовала единая метрика для быстрого выявления интентов с деградирующим качеством. Оценка была фрагментарной, занимала много времени, и было трудно приоритизировать улучшения для разных команд. Низкая точность интентов приводила к ошибкам автоматизации, увеличению нагрузки на операторов и росту SLA.
-
-### Цель
-Разработать универсальную метрику **Badness Score**, которая позволяет:  
-- Быстро выявлять интенты, требующие доработки.  
-- Автоматизировать расчёт и мониторинг.  
-- Визуализировать динамику по интентам и во времени.  
-
-**Критерии успеха:**  
-- Выявление 90% проблемных интентов с первого раза.  
-- Корреляция с ручной экспертной оценкой.
-
-### Подход
-
-**Data Pipeline**  
-- Сбор метрик для всех интентов: точность, автоматизация, CSAT, отказы, время на операторе, проблемы, усилия и т.д.  
-- Автоматизированный ETL-процесс через Airflow.  
-
-**Метрика**  
-- Формула для оценки важности признаков посредством весов:  
-  `Badness_Score = w1*(1-accuracy) + w2*(1-operator_time) + ...`  
-- Гибкое управление весами: разные роли могут приоритизировать показатели без ручного пересчета. 
-
-**Аналитика и визуализация**  
-- Предобработка: выявление выбросов по перцентилям, работа с пропусками, нормализация (Z-score, MinMax).  
-- Функции для расчета с возможностью исключения метрик или задания кастомных порогов.  
-- Дашборды в Power BI с топ-10 "плохих" интентов и динамикой изменений.  
-
-**Эксперименты**  
-- Тестирование разных нормализаций для устойчивости метрики.  
-- A/B-тест визуализаций (таблица vs график).  
-- Сравнение ранжирования по одной метрике и комплексной Badness Score.  
-
-**Поддержка AI**  
-- LLM использовался для быстрой классификации новых интентов и генерации тестовых примеров.
-
-**Метрики оценки**  
-- Корреляция с экспертной оценкой.  
-- Recall по выявлению проблемных интентов (порог > 0.8).
-
-### Результаты
-- Сокращение времени на поиск проблемных интентов на 80%+.  
-- Разные роли видят топ-10 худших интентов сразу (в зависимости от выбранного приоритета по метрикам).  
-- Выявлены объемные "плохие" интенты, ранее не считавшиеся проблемными.  
-
-### Бизнес-эффект
-- Снижение SLA.  
-- Снижение нагрузки на операторов.  
-- Экономия до 20 часов работы аналитиков в месяц.  
-- Рост точности системы.
-
-### Ключевые навыки
-- Разработка метрик качества.  
-- Автоматизированные аналитические пайплайны.  
-- Валидация метрик на исторических данных и экспертах.  
-- Гибкая настройка весов для разных ролей команды.
-
-### Пайплайн
-
-![Pipeline diagram](assets/pipeline_ru_version.png)
+<sub>Individual project completed as part of a Data / ML Analytics role. Described here for portfolio purposes; production code is not publicly available.</sub>
